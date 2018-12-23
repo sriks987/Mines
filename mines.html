@@ -1,0 +1,211 @@
+<html>
+  <head>
+    <title>minesweeper</title>
+  </head>
+  <script>
+    size = 16;
+    counts = 0;
+    countf = 0;
+    elements = new Array(0,0,0,0,0,0,0,0,0,0,0,0,-5,-5,-5,-5);
+    images=[];
+
+    function placeMines(a)
+ 		{   var j, x, i;
+    		for (i = a.length - 1; i > 0; i--)
+	      {
+	        j = Math.floor(Math.random() * (i + 1));
+		      x = a[i];
+		      a[i] = a[j];
+		      a[j] = x;
+		    }
+        for (i=0; i<a.length; i++)
+        {
+          if (a[i]<0)
+          {
+           if (i+3 < size)
+           {
+            if (Math.floor((i+3)/4) != Math.floor(i/4))
+              a[i+3]++;
+           }
+           if (i-3 >= 0)
+           {
+            if (Math.floor((i-3)/4) != Math.floor(i/4))
+              a[i-3]++;
+           }
+           if (i-4>=0)
+              a[i-4]++;
+           if (i+4 < size)
+              a[i+4]++;
+           // 2 steps is not possible
+           if (i-1>=0)
+           {
+             if (Math.floor((i-1)/4) == Math.floor(i/4))
+              a[i-1]++;
+           }
+           if (i+1 < size)
+           {
+             if (Math.floor((i+1)/4) == Math.floor(i/4))
+              a[i+1]++;
+           }
+           if (i+5 < size)
+           { if (Math.floor((i+5)/4) == Math.floor(i/4)+1)
+              a[i+5]++;
+           }
+           if (i-5>=0)
+           {
+             if (Math.floor((i-5)/4) == Math.floor(i/4)-1)
+              a[i-5]++;
+           }
+          }
+        }
+		}
+
+    function formBoard(a,images)
+    {
+      for(var i=0;i<16;i++)
+      {
+        switch(a[i])
+        {
+          case 0: images.push("number0.jpg");
+                  break;
+          case 1: images.push("number1.png");
+                  break;
+          case 2: images.push("number2.jpg");
+                  break;
+          case 3: images.push("number3.jpg");
+                  break;
+          case 4: images.push("number4.jpg");
+                  break;
+          default: images.push("mine.png");
+        }
+      }
+    }
+
+    function makeBoard()
+    {
+      for(var i=1;i<=16;i++)
+      {
+        var x = document.getElementById(i);
+        x.setAttribute("src",images[i-1]);
+				x.setAttribute("width","100px");
+				x.setAttribute("height","100px");
+				x.style.visibility="hidden";
+				x.parentNode.addEventListener("mousedown",show,false);
+      }
+    }
+
+    function show(e)
+    {
+      var ide = this.children[0].id;
+      if(e.button==1)
+      {
+
+        if (countf <= 4)
+        {
+          if (this.children[0].style.visibility=="hidden" && countf<4)
+          {
+            if (this.children[0].getAttribute("src")=="mine.png")
+              counts++;
+            this.children[0].setAttribute("src","flag.png");
+            countf++;
+            this.children[0].style.visibility="visible";
+            if (counts==4)
+              alert("You've won the game");
+          }
+          else if(this.children[0].style.visibility=="visible")
+          {
+            if (this.children[0].getAttribute("src")=="flag.png")
+            { this.children[0].style.visibility="hidden";
+              this.children[0].setAttribute("src",images[ide-1]);
+              counts--;
+              countf--;
+            }
+          }
+        }//end of right click
+      }
+      else if(e.button==0)
+      {
+        if (this.children[0].style.visibility=="hidden")
+          if (this.children[0].getAttribute("src")=="mine.png")
+          { this.children[0].style.visibility="visible";
+            alert("Game over you lost");
+          }
+          else
+          {
+            this.children[0].style.visibility="visible"
+          }
+      }
+    }
+
+    function timer()
+		{
+			var t=document.getElementsByTagName("th");
+			console.log(t[0]);
+			if(parseInt(t[0].innerHTML)<=0)
+			{
+				clearInterval(intr);
+				//alert("bye");
+			}
+			intr=setInterval(function()
+			{if(parseInt(t[0].innerHTML)<=0)
+			{
+				flag=0;
+				clearInterval(intr);
+				var x=document.getElementsByTagName("img");
+				alert("Game Over you lost");
+				for (i=0;i<x.length;i++)
+				{
+					x[i].style.visibility="visible";
+					x[i].onclick=function(){;};
+				}
+				t[0].innerHTML="Game over";
+				flag=0;
+				return;
+			}
+			t[0].innerHTML=parseInt(t[0].innerHTML)-1+"seconds remaining";},1000);
+
+		}
+  </script>
+  <body>
+    <table border="border">
+      <th colspan=6>120 sec remaining</th>
+      <tr>
+        <td><img id="1"></td>
+        <td><img id="2"></td>
+        <td><img id="3"></td>
+        <td><img id="4"></td>
+      </tr>
+      <tr>
+        <td><img id="5"></td>
+        <td><img id="6"></td>
+        <td><img id="7"></td>
+        <td><img id="8"></td>
+      </tr>
+      <tr>
+        <td><img id="9"></td>
+        <td><img id="10"></td>
+        <td><img id="11"></td>
+        <td><img id="12"></td>
+      </tr>
+      <tr>
+        <td><img id="13"></td>
+        <td><img id="14"></td>
+        <td><img id="15"></td>
+        <td><img id="16"></td>
+      </tr>
+    </table>
+    <script>
+    placeMines(elements);
+    formBoard(elements,images);
+    makeBoard();
+    document.body.onclick=timer1;
+			flag=1;
+			function timer1()
+			{
+				flag=1;
+			}
+			if(flag)
+				timer();
+    </script>
+  </body>
+</html>
